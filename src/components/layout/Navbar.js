@@ -10,7 +10,7 @@ const Header = (props) => {
   const links = auth.uid ? <SignedInLinks profile={profile} /> : <SignedOutLinks />;
 
   return (
-    <Navbar bg="dark" variant="dark">
+    <Navbar bg="dark" variant="dark" sticky="top">
       <Navbar.Brand as={Link} to="/">AMAVI Table</Navbar.Brand>
       <Nav className="ml-auto">
         {links}

@@ -1,3 +1,5 @@
+import { CREATE_RECORD_SUCCESS, CREATE_RECORD_ERROR } from '../dataTypes/recordType'
+
 export const createRecord = (record) => {
   return (dispatch, getState, {getFirestore}) => {
     const firestore = getFirestore();
@@ -10,9 +12,9 @@ export const createRecord = (record) => {
       authorId: authorId,
       createdAt: new Date()
     }).then(() => {
-      dispatch({ type: 'CREATE_RECORD_SUCCESS' });
+      dispatch({ type: CREATE_RECORD_SUCCESS });
     }).catch(err => {
-      dispatch({ type: 'CREATE_RECORD_ERROR' }, err);
+      dispatch({ type: CREATE_RECORD_ERROR }, err);
     });
   }
 };

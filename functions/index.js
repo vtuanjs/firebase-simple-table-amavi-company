@@ -15,8 +15,8 @@ exports.projectCreated = functions.firestore
 
     const project = doc.data();
     const notification = {
-      content: 'Added a new project',
-      user: `${project.authorFirstName} ${project.authorLastName}`,
+      content: 'Đã tạo mới bảng: ' + project.title ,
+      user: `${project.authorLastName} ${project.authorFirstName}`,
       time: admin.firestore.FieldValue.serverTimestamp()
     }
 
@@ -28,10 +28,10 @@ exports.recoredCreated = functions.firestore
   .document('records/{recordId}')
   .onCreate(doc => {
 
-    const project = doc.data();
+    const record = doc.data();
     const notification = {
-      content: 'Added a new record',
-      user: `${project.authorFirstName} ${project.authorLastName}`,
+      content: `Đã thêm nhà cung cấp: ${record.name}, chuyên cung cấp: ${record.product}`,
+      user: `${record.authorLastName} ${record.authorFirstName}`,
       time: admin.firestore.FieldValue.serverTimestamp()
     }
 
@@ -47,8 +47,8 @@ exports.userJoined = functions.auth.user()
 
         const newUser = doc.data();
         const notification = {
-          content: 'Joined the party',
-          user: `${newUser.firstName} ${newUser.lastName}`,
+          content: 'Đã tham gia',
+          user: `${newUser.lastName} ${newUser.firstName}`,
           time: admin.firestore.FieldValue.serverTimestamp()
         };
 

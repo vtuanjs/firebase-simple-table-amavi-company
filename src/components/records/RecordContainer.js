@@ -12,7 +12,7 @@ const RecordContainer = props => {
   if (!auth.uid) return <Redirect to="/signin" />;
 
   return (
-    <Container>
+    <Container fluid>
       <Row>
         <RecordList records={records} />
       </Row>

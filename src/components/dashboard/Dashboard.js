@@ -7,7 +7,7 @@ import { compose } from 'redux'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-bootstrap'
 import { createSelector } from 'reselect'
-
+import { projectsSelector } from '../../store/selectors/projectSelector'
 
 class Dashboard extends Component {
   render() {
@@ -54,6 +54,6 @@ export default compose(
   connect(mapStateToProps),
   firestoreConnect([
     { collection: 'projects', orderBy: ['createdAt', 'desc']},
-    { collection: 'notifications', limit: 3, orderBy: ['time', 'desc']}
+    { collection: 'notifications', limit: 8, orderBy: ['time', 'desc']}
   ])
 )(Dashboard)

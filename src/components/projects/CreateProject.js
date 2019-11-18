@@ -1,56 +1,77 @@
-import React, { Component } from 'react'
-import { connect } from 'react-redux'
-import { createProject } from '../../store/actions/projectActions'
-import { Redirect } from 'react-router-dom'
+import React, { Component } from "react";
+import { connect } from "react-redux";
+import { createProject } from "../../store/actions/projectActions";
+import { Redirect } from "react-router-dom";
+import { Form, Button, Container } from "react-bootstrap";
 
 class CreateProject extends Component {
   state = {
-    title: '',
-    content: ''
-  }
-  handleChange = (e) => {
+    title: "",
+    content: ""
+  };
+
+  handleChange = e => {
     this.setState({
       [e.target.id]: e.target.value
-    })
-  }
-  handleSubmit = (e) => {
+    });
+  };
+  handleSubmit = e => {
     e.preventDefault();
-    // console.log(this.state);
     this.props.createProject(this.state);
-    this.props.history.push('/');
-  }
+    this.props.refContainer.current.hide();
+  };
   render() {
     const { auth } = this.props;
-    if (!auth.uid) return <Redirect to='/signin' /> 
+
+    if (!auth.uid) return <Redirect to="/signin" />;
     return (
-      <div className="container">
-        <form className="white" onSubmit={this.handleSubmit}>
-          <h5 className="grey-text text-darken-3">Create a New Project</h5>
-          <div className="input-field">
-            <input type="text" id='title' onChange={this.handleChange} />
-            <label htmlFor="title">Project Title</label>
-          </div>
-          <div className="input-field">
-            <textarea id="content" className="materialize-textarea" onChange={this.handleChange}></textarea>
-            <label htmlFor="content">Project Content</label>
-          </div>
-          <div className="input-field">
-            <button className="btn pink lighten-1">Create</button>
-          </div>
-        </form>
-      </div>
-    )
+      <Container fluid>
+        <Form onSubmit={this.handleSubmit}>
+          <Form.Group controlId="formBasicTitle" className="input-field first">
+            <Form.Label htmlFor="title">Nhập tiêu đề bảng</Form.Label>
+            <Form.Control
+              type="text"
+              id="title"
+              onChange={this.handleChange}
+              required
+              autocomplete="off"
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formBasicContent" className="input-field last">
+            <Form.Label htmlFor="content">Nhập mô tả</Form.Label>
+            <Form.Control
+              type="text"
+              id="content"
+              onChange={this.handleChange}
+              required
+              autocomplete="off"
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Button variant="primary" type="submit">
+              Tạo bảng
+            </Button>
+            <span className="p-2"></span>
+            <Button onClick={() => this.props.refContainer.current.hide()}>
+              Đóng
+            </Button>
+          </Form.Group>
+        </Form>
+      </Container>
+    );
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
     auth: state.firebase.auth
-  }
-}
+  };
+};
 
 const mapActionToProps = {
   createProject
-}
+};
 
-export default connect(mapStateToProps, mapActionToProps)(CreateProject)
+export default connect(mapStateToProps, mapActionToProps)(CreateProject);

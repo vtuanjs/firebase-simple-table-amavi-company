@@ -7,5 +7,5 @@ export const projectsSelector = createSelector(
 
 export const projectSelector = createSelector(
   state => state.firestore.ordered.filterProjects,
-  filterProjects => filterProjects ? filterProjects[0] : null
+  project => project ? project[0] : null
 );

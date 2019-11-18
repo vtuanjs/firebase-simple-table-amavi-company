@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { signUp } from '../../store/actions/authActions'
+import { Form, Button, Container, Col } from 'react-bootstrap'
 
 class SignUp extends Component {
   state = {
@@ -23,33 +24,57 @@ class SignUp extends Component {
     const { auth, authError } = this.props;
     if (auth.uid) return <Redirect to='/' /> 
     return (
-      <div className="container">
-        <form className="white" onSubmit={this.handleSubmit}>
-          <h5 className="grey-text text-darken-3">Sign Up</h5>
-          <div className="input-field">
-            <label htmlFor="email">Email</label>
-            <input type="email" id='email' onChange={this.handleChange} />
-          </div>
-          <div className="input-field">
-            <label htmlFor="password">Password</label>
-            <input type="password" id='password' onChange={this.handleChange} />
-          </div>
-          <div className="input-field">
-            <label htmlFor="firstName">First Name</label>
-            <input type="text" id='firstName' onChange={this.handleChange} />
-          </div>
-          <div className="input-field">
-            <label htmlFor="lastName">Last Name</label>
-            <input type="text" id='lastName' onChange={this.handleChange} />
-          </div>
-          <div className="input-field">
-            <button className="btn pink lighten-1 z-depth-0">Sign Up</button>
-            <div className="center red-text">
-              { authError ? <p>{authError}</p> : null }
-            </div>
-          </div>
-        </form>
-      </div>
+      <Container as={Col} md="5" sm="12">
+        <Form className="shadow-lg bg-white rounded p-4 m-4" onSubmit={this.handleSubmit}>
+          <h3 className="center">ĐĂNG KÍ</h3>
+
+          <Form.Group controlId="formBasicEmail" className="input-field">
+            <Form.Label htmlFor="email">Nhập Email</Form.Label>
+            <Form.Control
+              type="email"
+              id="email"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formBasicPassword" className="input-field">
+            <Form.Label htmlFor="password">Nhập Password</Form.Label>
+            <Form.Control
+              type="password"
+              id="password"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formBasicLastName" className="input-field">
+            <Form.Label htmlFor="lastName">Nhập Họ</Form.Label>
+            <Form.Control
+              type="text"
+              id="lastName"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+
+          <Form.Group controlId="formBasicFirstname" className="input-field">
+            <Form.Label htmlFor="firstName">Nhập Tên</Form.Label>
+            <Form.Control
+              type="text"
+              id="firstName"
+              onChange={this.handleChange}
+            />
+          </Form.Group>
+
+          <Form.Group>
+            <Form inline></Form>
+            <Button variant="primary" type="submit">
+              Đăng kí
+            </Button>
+            <Form className="center red-text">
+              {authError ? <p>{authError}</p> : null}
+            </Form>
+          </Form.Group>
+        </Form>
+      </Container>
     )
   }
 }
