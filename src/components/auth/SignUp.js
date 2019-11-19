@@ -5,11 +5,14 @@ import { signUp } from '../../store/actions/authActions'
 import { Form, Button, Container, Col } from 'react-bootstrap'
 
 class SignUp extends Component {
-  state = {
-    email: '',
-    password: '',
-    firstName: '',
-    lastName: '',
+  constructor(props){
+    super(props)
+    this.state = {
+      email: '',
+      password: '',
+      firstName: '',
+      lastName: '',
+    }
   }
   handleChange = (e) => {
     this.setState({
@@ -28,7 +31,7 @@ class SignUp extends Component {
         <Form className="shadow-lg bg-white rounded p-4 m-4" onSubmit={this.handleSubmit}>
           <h3 className="center">ĐĂNG KÍ</h3>
 
-          <Form.Group controlId="formBasicEmail" className="input-field">
+          <Form.Group className="input-field">
             <Form.Label htmlFor="email">Nhập Email</Form.Label>
             <Form.Control
               type="email"
@@ -37,7 +40,7 @@ class SignUp extends Component {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicPassword" className="input-field">
+          <Form.Group className="input-field">
             <Form.Label htmlFor="password">Nhập Password</Form.Label>
             <Form.Control
               type="password"
@@ -46,7 +49,7 @@ class SignUp extends Component {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicLastName" className="input-field">
+          <Form.Group className="input-field">
             <Form.Label htmlFor="lastName">Nhập Họ</Form.Label>
             <Form.Control
               type="text"
@@ -55,7 +58,7 @@ class SignUp extends Component {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicFirstname" className="input-field">
+          <Form.Group className="input-field">
             <Form.Label htmlFor="firstName">Nhập Tên</Form.Label>
             <Form.Control
               type="text"

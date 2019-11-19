@@ -5,10 +5,13 @@ import { Redirect } from "react-router-dom";
 import { Form, Button, Container } from "react-bootstrap";
 
 class CreateProject extends Component {
-  state = {
-    title: "",
-    content: ""
-  };
+  constructor(props) {
+    super(props)
+    this.state = {
+      title: "",
+      content: ""
+    }
+  }
 
   handleChange = e => {
     this.setState({
@@ -27,25 +30,25 @@ class CreateProject extends Component {
     return (
       <Container fluid>
         <Form onSubmit={this.handleSubmit}>
-          <Form.Group controlId="formBasicTitle" className="input-field first">
+          <Form.Group className="input-field first">
             <Form.Label htmlFor="title">Nhập tiêu đề bảng</Form.Label>
             <Form.Control
               type="text"
               id="title"
               onChange={this.handleChange}
               required
-              autocomplete="off"
+              autoComplete="off"
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicContent" className="input-field last">
+          <Form.Group className="input-field last">
             <Form.Label htmlFor="content">Nhập mô tả</Form.Label>
             <Form.Control
               type="text"
               id="content"
               onChange={this.handleChange}
               required
-              autocomplete="off"
+              autoComplete="off"
             />
           </Form.Group>
 

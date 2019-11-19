@@ -5,10 +5,13 @@ import { Redirect, Link } from "react-router-dom";
 import { Form, Button, Container, Col } from "react-bootstrap";
 
 class SignIn extends Component {
-  state = {
-    email: "",
-    password: ""
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      email: "",
+      password: ""
+    };
+  }
   handleChange = e => {
     this.setState({
       [e.target.id]: e.target.value
@@ -23,10 +26,13 @@ class SignIn extends Component {
     if (auth.uid) return <Redirect to="/" />;
     return (
       <Container as={Col} md="5" sm="12">
-        <Form className="shadow-lg bg-white rounded p-4 m-4" onSubmit={this.handleSubmit}>
+        <Form
+          className="shadow-lg bg-white rounded p-4 m-4"
+          onSubmit={this.handleSubmit}
+        >
           <h3 className="center">ĐĂNG NHẬP</h3>
 
-          <Form.Group controlId="formBasicEmail" className="input-field">
+          <Form.Group className="input-field">
             <Form.Label htmlFor="email">Nhập email</Form.Label>
             <Form.Control
               type="email"
@@ -35,7 +41,7 @@ class SignIn extends Component {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicPassword" className="input-field">
+          <Form.Group className="input-field">
             <Form.Label htmlFor="password">Nhập password</Form.Label>
             <Form.Control
               type="password"
@@ -51,7 +57,7 @@ class SignIn extends Component {
             </Button>
             <Form>
               <Form.Label className="mt-4">
-              Chưa có tải khoản? <Link to="/signup">Đăng kí ngay!</Link>
+                Chưa có tải khoản? <Link to="/signup">Đăng kí ngay!</Link>
               </Form.Label>
             </Form>
             <Form className="center red-text">

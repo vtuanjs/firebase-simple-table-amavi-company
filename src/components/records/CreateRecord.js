@@ -5,17 +5,20 @@ import { Redirect } from "react-router-dom";
 import { Form, Button, Container, Col } from "react-bootstrap";
 
 class CreateRecord extends Component {
-  state = {
-    name: localStorage.getItem('name') || "",
-    phone: localStorage.getItem('phone') || "",
-    email: localStorage.getItem('email') || "",
-    address: localStorage.getItem('address') || "",
-    website: localStorage.getItem('website') || "",
-    product: localStorage.getItem('product') || "",
-    note: localStorage.getItem('note') || "",
-    rate: "5",
-    projectId: this.props.projectId
-  };
+  constructor(props){
+    super(props)
+    this.state = {
+      name: localStorage.getItem('name') || "",
+      phone: localStorage.getItem('phone') || "",
+      email: localStorage.getItem('email') || "",
+      address: localStorage.getItem('address') || "",
+      website: localStorage.getItem('website') || "",
+      product: localStorage.getItem('product') || "",
+      note: localStorage.getItem('note') || "",
+      rate: "5",
+      projectId: this.props.projectId
+    };
+  }
 
   clearRecordStorage = () => {
     localStorage.removeItem('name')
