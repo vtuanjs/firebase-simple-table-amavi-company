@@ -4,15 +4,82 @@ import { firestoreConnect } from "react-redux-firebase";
 import { compose } from "redux";
 import { Redirect, Link } from "react-router-dom";
 import { Container, Form, Col, Row, Button } from "react-bootstrap";
+import { createSelector } from "reselect";
+import { firestoreSeclector, authSelector } from "../../store/selector";
 import moment from "moment";
+import { Modal, ModalManager, Effect } from "react-dynamic-modal";
+import { deleteRecord } from "../../store/actions/recordActions";
+
+const MyModal = props => {
+  const handelDelete = () => {
+    ModalManager.close();
+    props.deleteRecord();
+  };
+  return (
+    <Modal
+      style={{ content: { width: "45%" } }}
+      onRequestClose={props.onRequestClose}
+      effect={Effect.Sign3D}
+    >
+      <Row>
+        <Col className="p-4 mx-2">
+          <h3 className="text-center">Xác nhận xoá</h3>
+          <div>
+            Bạn có muốn xoá bảng <b>{props.title}</b> không?
+          </div>
+          <div>Sau khi xoá, dữ liệu không thể khôi phục.</div>
+          <div className="text-right mt-4">
+            <Button
+              size="sm"
+              variant="primary"
+              className="mx-1"
+              onClick={() => handelDelete()}
+            >
+              Xoá
+            </Button>
+            <Button size="sm" className="mx-1" onClick={ModalManager.close}>
+              Không
+            </Button>
+          </div>
+        </Col>
+      </Row>
+    </Modal>
+  );
+};
 
 const RecordDetails = props => {
   const { record, auth } = props;
+  const id = props.id;
   if (!auth.uid) return <Redirect to="/signin" />;
+  const handleDeleteRecord = recordId => {
+    props.deleteRecord(recordId);
+    props.history.push(`/projects/${props.match.params.projectId}`);
+  };
+
+  const openModal = (recordTitle, recordId) => {
+    ModalManager.open(
+      <MyModal
+        title={recordTitle}
+        deleteRecord={() => handleDeleteRecord(recordId)}
+        onRequestClose={() => true}
+      />
+    );
+  };
+
   if (record) {
+    // const disabledButton = project.roles[authId] === "owner" ? false : true;
     return (
       <Container>
         <Col className="text-right mt-4">
+          <Button
+            className="mx-1"
+            size="sm"
+            variant="danger"
+            // disabled={disabledButton}
+            onClick={() => openModal(record.title, id)}
+          >
+            Xoá record
+          </Button>
           <Button as={Link} to={`/projects/${record.projectId}`}>
             Quay lại bảng
           </Button>
@@ -122,43 +189,29 @@ const RecordDetails = props => {
   }
 };
 
-// const mapStateToProps = createSelector(
-//   recordSelector,
-//   authSelector,
-//   (record, auth) => ({ record, auth })
-// );
+const recordIdSelector = (_, props) => props.match.params.recordId;
 
-// export default withRouter(
-//   compose(
-//     connect(mapStateToProps),
-//     firestoreConnect(props => {
-//       const recordId = props.match.params.recordId;
+const mapStateToProps = createSelector(
+  recordIdSelector,
+  authSelector,
+  firestoreSeclector,
+  (id, auth, firestore) => ({
+    record: firestore.data.records && firestore.data.records[id],
+    auth,
+    id
+  })
+);
 
-//       return [
-//         {
-//           collection: "records",
-//           doc: recordId,
-//           storeAs: "filterRecords"
-//         }
-//       ];
-//     })
-//   )(RecordDetails)
-// );
-
-const mapStateToProps = (state, ownProps) => {
-  // console.log(state);
-  const id = ownProps.match.params.recordId;
-  const records = state.firestore.data.records;
-  const record = records ? records[id] : null
-  return {
-    record: record,
-    auth: state.firebase.auth
-  }
-}
+const mapActionToProps = {
+  deleteRecord
+};
 
 export default compose(
-  connect(mapStateToProps),
-  firestoreConnect([{
-    collection: 'records'
-  }])
-)(RecordDetails)
+  connect(mapStateToProps, mapActionToProps),
+  firestoreConnect(props => [
+    {
+      collection: "records",
+      doc: props.match.params.recordId
+    }
+  ])
+)(RecordDetails);

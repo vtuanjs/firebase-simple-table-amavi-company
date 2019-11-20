@@ -6,6 +6,8 @@ import { Redirect } from "react-router-dom";
 import moment from "moment";
 import CreateRecord from "../records/CreateRecord";
 import RecordContainer from "../records/RecordContainer";
+import { createSelector } from 'reselect'
+import { firestoreSeclector, authSelector } from "../../store/selector"
 import {
   Button,
   OverlayTrigger,
@@ -172,24 +174,26 @@ const ProjectDetails = props => {
   }
 };
 
+const projectIdSelector = (_, props) => props.match.params.projectId
+
+const mapStateToProps = createSelector(
+  projectIdSelector,
+  firestoreSeclector,
+  authSelector,
+  (id, firestore, auth) => ({
+    project: firestore.data.projects && firestore.data.projects[id],
+    auth
+  })
+)
+
 const mapActionToProps = {
   deleteProject
 };
 
-const mapStateToProps = (state, ownProps) => {
-  // console.log(state);
-  const id = ownProps.match.params.projectId;
-  const projects = state.firestore.data.projects;
-  const project = projects ? projects[id] : null
-  return {
-    project: project,
-    auth: state.firebase.auth
-  }
-}
-
 export default compose(
   connect(mapStateToProps, mapActionToProps),
-  firestoreConnect([{
-    collection: 'projects'
+  firestoreConnect(props => [{
+    collection: 'projects',
+    doc: props.match.params.projectId
   }])
 )(ProjectDetails)

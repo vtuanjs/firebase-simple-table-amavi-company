@@ -54,7 +54,7 @@ exports.recoredCreated = functions.firestore
   .onCreate(doc => {
     const record = doc.data();
     const notification = {
-      content: `Đã thêm nhà cung cấp: ${record.name}, chuyên cung cấp: ${record.product}`,
+      content: `Đã thêm nhà cung cấp: ${record.name}`,
       user: `${record.authorLastName} ${record.authorFirstName}`,
       time: admin.firestore.FieldValue.serverTimestamp()
     };

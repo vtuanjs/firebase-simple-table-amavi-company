@@ -1,6 +1,7 @@
 import {
   CREATE_PROJECT_SUCCESS,
   CREATE_PROJECT_ERROR,
+  DELETE_PROJECT_REQUEST,
   DELETE_PROJECT_SUCCESS,
   DELETE_PROJECT_ERROR
 } from "../dataTypes/projectType";
@@ -32,6 +33,7 @@ export const createProject = project => {
 
 export const deleteProject = projectId => {
   return (dispatch, getState, { getFirestore }) => {
+    dispatch({ type: DELETE_PROJECT_REQUEST });
     const firestore = getFirestore();
     firestore
       .collection("projects")

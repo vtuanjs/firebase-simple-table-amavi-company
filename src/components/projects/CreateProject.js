@@ -3,14 +3,16 @@ import { connect } from "react-redux";
 import { createProject } from "../../store/actions/projectActions";
 import { Redirect } from "react-router-dom";
 import { Form, Button, Container } from "react-bootstrap";
+import { createSelector } from "reselect";
+import { authSelector } from "../../store/selector";
 
 class CreateProject extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       title: "",
       content: ""
-    }
+    };
   }
 
   handleChange = e => {
@@ -67,11 +69,7 @@ class CreateProject extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    auth: state.firebase.auth
-  }
-}
+const mapStateToProps = createSelector(authSelector, auth => ({ auth }));
 
 const mapActionToProps = {
   createProject

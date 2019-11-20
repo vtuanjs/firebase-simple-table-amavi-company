@@ -1,6 +1,7 @@
 import {
   CREATE_PROJECT_SUCCESS,
   CREATE_PROJECT_ERROR,
+  DELETE_PROJECT_REQUEST,
   DELETE_PROJECT_SUCCESS,
   DELETE_PROJECT_ERROR
 } from "../dataTypes/projectType";
@@ -11,6 +12,8 @@ const projectReducer = (state = initState, action) => {
     case CREATE_PROJECT_SUCCESS:
       return state;
     case CREATE_PROJECT_ERROR:
+      return state;
+    case DELETE_PROJECT_REQUEST:
       return state;
     case DELETE_PROJECT_SUCCESS:
       return state;

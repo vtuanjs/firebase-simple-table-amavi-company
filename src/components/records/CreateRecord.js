@@ -3,32 +3,40 @@ import { connect } from "react-redux";
 import { createRecord } from "../../store/actions/recordActions";
 import { Redirect } from "react-router-dom";
 import { Form, Button, Container, Col } from "react-bootstrap";
+import { createSelector } from "reselect";
+import { authSelector } from "../../store/selector";
 
 class CreateRecord extends Component {
-  constructor(props){
-    super(props)
+  constructor(props) {
+    super(props);
     this.state = {
-      name: localStorage.getItem('name') || "",
-      phone: localStorage.getItem('phone') || "",
-      email: localStorage.getItem('email') || "",
-      address: localStorage.getItem('address') || "",
-      website: localStorage.getItem('website') || "",
-      product: localStorage.getItem('product') || "",
-      note: localStorage.getItem('note') || "",
+      name: localStorage.getItem("name") || "",
+      phone: localStorage.getItem("phone") || "",
+      email: localStorage.getItem("email") || "",
+      address: localStorage.getItem("address") || "",
+      website: localStorage.getItem("website") || "",
+      product: localStorage.getItem("product") || "",
+      note: localStorage.getItem("note") || "",
       rate: "5",
       projectId: this.props.projectId
     };
   }
 
   clearRecordStorage = () => {
-    localStorage.removeItem('name')
-    localStorage.removeItem('phone')
-    localStorage.removeItem('email')
-    localStorage.removeItem('address')
-    localStorage.removeItem('website')
-    localStorage.removeItem('product')
-    localStorage.removeItem('note')
-  }
+    const recordFields = [
+      "name",
+      "phone",
+      "email",
+      "address",
+      "website",
+      "oridyct",
+      "note"
+    ];
+    
+    recordFields.forEach(field => {
+      localStorage.removeItem(field);
+    })
+  };
 
   handleChange = e => {
     this.setState({
@@ -38,7 +46,7 @@ class CreateRecord extends Component {
   };
 
   handleClearFormData = () => {
-    this.clearRecordStorage()
+    this.clearRecordStorage();
     this.setState({
       name: "",
       phone: "",
@@ -48,12 +56,12 @@ class CreateRecord extends Component {
       product: "",
       note: ""
     });
-  }
+  };
 
   handleSubmit = e => {
     e.preventDefault();
     this.props.createRecord(this.state);
-    this.clearRecordStorage()
+    this.clearRecordStorage();
     this.props.refContainer.current.hide();
   };
   render() {
@@ -186,11 +194,7 @@ class CreateRecord extends Component {
   }
 }
 
-const mapStateToProps = state => {
-  return {
-    auth: state.firebase.auth
-  };
-};
+const mapStateToProps = createSelector(authSelector, auth => ({ auth }));
 
 const mapDispatchToProps = dispatch => {
   return {
