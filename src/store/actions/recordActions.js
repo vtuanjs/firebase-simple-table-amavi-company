@@ -9,7 +9,9 @@ export const createRecord = (record) => {
       ...record,
       authorFirstName: profile.firstName,
       authorLastName: profile.lastName,
-      authorId: authorId,
+      roles: {
+        [authorId]: 'owner'
+      },
       createdAt: new Date()
     }).then(() => {
       dispatch({ type: CREATE_RECORD_SUCCESS });

@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { connect } from "react-redux";
 import { firestoreConnect } from "react-redux-firebase";
 import { compose } from "redux";
-import { Redirect, withRouter } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import moment from "moment";
 import CreateRecord from "../records/CreateRecord";
 import RecordContainer from "../records/RecordContainer";
@@ -12,17 +12,64 @@ import {
   Popover,
   Container,
   Table,
-  Row
+  Row,
+  Col
 } from "react-bootstrap";
-import { createSelector } from "reselect";
-import { projectSelector } from "../../store/selectors/projectSelector";
-import { authSelector } from "../../store/selectors/authSelector";
+import { Modal, ModalManager, Effect } from "react-dynamic-modal";
 import { deleteProject } from "../../store/actions/projectActions";
+
+const MyModal = props => {
+  const [inputValue, setInputValue] = useState("");
+  const handelDelete = () => {
+    if (inputValue === props.title) {
+      ModalManager.close();
+      props.deleteProject();
+    }
+  };
+  return (
+    <Modal
+      style={{ content: { width: "45%" } }}
+      onRequestClose={props.onRequestClose}
+      effect={Effect.Sign3D}
+    >
+      <Row>
+        <Col className="p-4 mx-2">
+          <h3 className="text-center">Xác nhận xoá</h3>
+          <div>
+            Bạn có muốn xoá bảng <b>{props.title}</b> không?
+          </div>
+          <div>Sau khi xoá, dữ liệu không thể khôi phục.</div>
+          <div>Nhập lại tên bảng để xác nhận</div>
+          <input
+            type="text"
+            className="form-control"
+            placeholder={`Nhập lại tên bảng`}
+            onChange={e => setInputValue(e.target.value)}
+          ></input>
+          <div className="text-right mt-4">
+            <Button
+              size="sm"
+              variant="primary"
+              className="mx-1"
+              onClick={() => handelDelete()}
+            >
+              Xoá
+            </Button>
+            <Button size="sm" className="mx-1" onClick={ModalManager.close}>
+              Không
+            </Button>
+          </div>
+        </Col>
+      </Row>
+    </Modal>
+  );
+};
 
 const ProjectDetails = props => {
   const { project, auth } = props;
   const id = props.match.params.projectId;
   const refContainer = useRef();
+  const authId = auth.uid;
 
   const popover = (
     <Popover id="pop" style={{ maxWidth: "none", minWidth: "30%" }}>
@@ -31,13 +78,24 @@ const ProjectDetails = props => {
     </Popover>
   );
 
-  const handleDeleteProject = project => {
-    props.deleteProject(project);
+  const handleDeleteProject = projectId => {
+    props.deleteProject(projectId);
     props.history.push("/");
+  };
+
+  const openModal = (projectTitle, projectId) => {
+    ModalManager.open(
+      <MyModal
+        title={projectTitle}
+        deleteProject={() => handleDeleteProject(projectId)}
+        onRequestClose={() => true}
+      />
+    );
   };
 
   if (!auth.uid) return <Redirect to="/signin" />;
   if (project) {
+    const disabledButton = project.roles[authId] === "owner" ? false : true;
     return (
       <Container fluid>
         <Row className="white mt-4 mr-2 ml-2">
@@ -57,37 +115,51 @@ const ProjectDetails = props => {
               </tr>
               <tr>
                 <td>
-                  <tr>
-                    <td>
-                      Tạo bởi {project.authorLastName} {project.authorFirstName}{" "}
-                      - {moment(project.createdAt.toDate()).calendar()}
-                    </td>
-                  </tr>
+                  Tạo bởi {project.authorLastName} {project.authorFirstName} -{" "}
+                  {moment(project.createdAt.toDate()).calendar()}
                 </td>
               </tr>
-              <td className="text-center">
-                <b>
-                  <Button className="mx-1" variant="light" size="sm" onClick={() => handleDeleteProject(project.id)}>
-                    Xoá bảng</Button>
-                  <Button className="mx-1" variant="light" size="sm">Sửa bảng</Button>
-            
-                  <OverlayTrigger
-                    trigger="click"
-                    key="bottom"
-                    placement="bottom"
-                    overlay={popover}
-                    ref={refContainer}
-                    rootClose
-                  >
-                    <Button className="mx-1" variant="light" size="sm">Thêm dòng mới</Button>
-                  </OverlayTrigger>
-                </b>
-              </td>
+              <tr>
+                <td className="text-center">
+                  <b>
+                    <Button
+                      className="mx-1"
+                      variant="light"
+                      size="sm"
+                      disabled={disabledButton}
+                      onClick={() => openModal(project.title, id)}
+                    >
+                      Xoá bảng
+                    </Button>
+                    <Button
+                      className="mx-1"
+                      variant="light"
+                      size="sm"
+                      disabled={disabledButton}
+                    >
+                      Sửa bảng
+                    </Button>
+
+                    <OverlayTrigger
+                      trigger="click"
+                      key="bottom"
+                      placement="bottom"
+                      overlay={popover}
+                      ref={refContainer}
+                      rootClose
+                    >
+                      <Button className="mx-1" variant="light" size="sm">
+                        Thêm dòng mới
+                      </Button>
+                    </OverlayTrigger>
+                  </b>
+                </td>
+              </tr>
             </tbody>
           </Table>
         </Row>
         <Row className="white mr-2 ml-2">
-          <RecordContainer projectId={id} />
+          <RecordContainer projectId={project.uid} />
         </Row>
       </Container>
     );
@@ -104,26 +176,20 @@ const mapActionToProps = {
   deleteProject
 };
 
-const mapStateToProps = createSelector(
-  projectSelector,
-  authSelector,
-  (project, auth) => ({
+const mapStateToProps = (state, ownProps) => {
+  // console.log(state);
+  const id = ownProps.match.params.projectId;
+  const projects = state.firestore.data.projects;
+  const project = projects ? projects[id] : null
+  return {
     project: project,
-    auth: auth
-  })
-);
+    auth: state.firebase.auth
+  }
+}
 
-export default withRouter(
-  compose(
-    connect(mapStateToProps, mapActionToProps),
-    firestoreConnect(props => {
-      return [
-        {
-          collection: "projects",
-          doc: props.match.params.projectId,
-          storeAs: "filterProjects"
-        }
-      ];
-    })
-  )(ProjectDetails)
-);
+export default compose(
+  connect(mapStateToProps, mapActionToProps),
+  firestoreConnect([{
+    collection: 'projects'
+  }])
+)(ProjectDetails)

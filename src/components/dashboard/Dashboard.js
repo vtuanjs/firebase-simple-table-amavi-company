@@ -6,8 +6,6 @@ import { firestoreConnect } from 'react-redux-firebase'
 import { compose } from 'redux'
 import { Redirect } from 'react-router-dom'
 import { Container, Row, Col } from 'react-bootstrap'
-import { createSelector } from 'reselect'
-import { projectsSelector } from '../../store/selectors/projectSelector'
 
 class Dashboard extends Component {
   render() {
@@ -29,26 +27,14 @@ class Dashboard extends Component {
   }
 }
 
-const authSelector = createSelector(
-  state => state.firebase.auth,
-  auth => auth
-)
-
-const notifySelector = createSelector(
-  state => state.firestore.ordered.notifications,
-  notifications => notifications
-)
-
-const mapStateToProps = createSelector(
-  projectsSelector,
-  authSelector,
-  notifySelector,
-  (projects, auth, notifications) => ({
-    projects,
-    auth,
-    notifications
-  })
-)
+const mapStateToProps = (state) => {
+  // console.log(state);
+  return {
+    projects: state.firestore.ordered.projects,
+    auth: state.firebase.auth,
+    notifications: state.firestore.ordered.notifications
+  }
+}
 
 export default compose(
   connect(mapStateToProps),

@@ -2,11 +2,8 @@ import React from "react";
 import { connect } from "react-redux";
 import { firestoreConnect } from "react-redux-firebase";
 import { compose } from "redux";
-import { Redirect, withRouter, Link } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 import { Container, Form, Col, Row, Button } from "react-bootstrap";
-import { recordSelector } from "../../store/selectors/recordSelector";
-import { authSelector } from "../../store/selectors/authSelector";
-import { createSelector } from "reselect";
 import moment from "moment";
 
 const RecordDetails = props => {
@@ -125,25 +122,43 @@ const RecordDetails = props => {
   }
 };
 
-const mapStateToProps = createSelector(
-  recordSelector,
-  authSelector,
-  (record, auth) => ({ record, auth })
-);
+// const mapStateToProps = createSelector(
+//   recordSelector,
+//   authSelector,
+//   (record, auth) => ({ record, auth })
+// );
 
-export default withRouter(
-  compose(
-    connect(mapStateToProps),
-    firestoreConnect(props => {
-      const recordId = props.match.params.recordId;
+// export default withRouter(
+//   compose(
+//     connect(mapStateToProps),
+//     firestoreConnect(props => {
+//       const recordId = props.match.params.recordId;
 
-      return [
-        {
-          collection: "records",
-          doc: recordId,
-          storeAs: "filterRecords"
-        }
-      ];
-    })
-  )(RecordDetails)
-);
+//       return [
+//         {
+//           collection: "records",
+//           doc: recordId,
+//           storeAs: "filterRecords"
+//         }
+//       ];
+//     })
+//   )(RecordDetails)
+// );
+
+const mapStateToProps = (state, ownProps) => {
+  // console.log(state);
+  const id = ownProps.match.params.recordId;
+  const records = state.firestore.data.records;
+  const record = records ? records[id] : null
+  return {
+    record: record,
+    auth: state.firebase.auth
+  }
+}
+
+export default compose(
+  connect(mapStateToProps),
+  firestoreConnect([{
+    collection: 'records'
+  }])
+)(RecordDetails)

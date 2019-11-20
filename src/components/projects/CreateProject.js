@@ -67,11 +67,11 @@ class CreateProject extends Component {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     auth: state.firebase.auth
-  };
-};
+  }
+}
 
 const mapActionToProps = {
   createProject

@@ -16,7 +16,9 @@ export const createProject = project => {
         ...project,
         authorFirstName: profile.firstName,
         authorLastName: profile.lastName,
-        authorId: authorId,
+        roles: {
+          [authorId]: 'owner'
+        },
         createdAt: new Date()
       })
       .then(() => {
