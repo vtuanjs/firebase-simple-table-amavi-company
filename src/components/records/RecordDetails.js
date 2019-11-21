@@ -67,7 +67,7 @@ const RecordDetails = props => {
   };
 
   if (record) {
-    // const disabledButton = project.roles[authId] === "owner" ? false : true;
+    const disabledButton = record.roles[auth.uid] === "owner" ? false : true;
     return (
       <Container>
         <Col className="text-right mt-4">
@@ -75,7 +75,7 @@ const RecordDetails = props => {
             className="mx-1"
             size="sm"
             variant="danger"
-            // disabled={disabledButton}
+            disabled={disabledButton}
             onClick={() => openModal(record.title, id)}
           >
             Xoá record
