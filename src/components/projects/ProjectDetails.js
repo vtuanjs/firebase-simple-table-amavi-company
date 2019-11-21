@@ -1,71 +1,25 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { connect } from "react-redux";
-import { firestoreConnect } from "react-redux-firebase";
+import { firestoreConnect, isLoaded, isEmpty } from "react-redux-firebase";
 import { compose } from "redux";
 import { Redirect } from "react-router-dom";
 import moment from "moment";
 import CreateRecord from "../records/CreateRecord";
 import RecordContainer from "../records/RecordContainer";
-import { createSelector } from 'reselect'
-import { firestoreSeclector, authSelector } from "../../store/selector"
+import { createSelector } from "reselect";
+import { firestoreSeclector, authSelector } from "../../store/selector";
 import {
   Button,
   OverlayTrigger,
   Popover,
   Container,
   Table,
-  Row,
-  Col
+  Row
 } from "react-bootstrap";
-import { Modal, ModalManager, Effect } from "react-dynamic-modal";
-import { deleteProject } from "../../store/actions/projectActions";
-
-const MyModal = props => {
-  const [inputValue, setInputValue] = useState("");
-  const handelDelete = () => {
-    if (inputValue === props.title) {
-      ModalManager.close();
-      props.deleteProject();
-    }
-  };
-  return (
-    <Modal
-      style={{ content: { width: "45%" } }}
-      onRequestClose={props.onRequestClose}
-      effect={Effect.Sign3D}
-    >
-      <Row>
-        <Col className="p-4 mx-2">
-          <h3 className="text-center">Xác nhận xoá</h3>
-          <div>
-            Bạn có muốn xoá bảng <b>{props.title}</b> không?
-          </div>
-          <div>Sau khi xoá, dữ liệu không thể khôi phục.</div>
-          <div>Nhập lại tên bảng để xác nhận</div>
-          <input
-            type="text"
-            className="form-control"
-            placeholder={`Nhập lại tên bảng`}
-            onChange={e => setInputValue(e.target.value)}
-          ></input>
-          <div className="text-right mt-4">
-            <Button
-              size="sm"
-              variant="primary"
-              className="mx-1"
-              onClick={() => handelDelete()}
-            >
-              Xoá
-            </Button>
-            <Button size="sm" className="mx-1" onClick={ModalManager.close}>
-              Không
-            </Button>
-          </div>
-        </Col>
-      </Row>
-    </Modal>
-  );
-};
+import { ModalManager } from "react-dynamic-modal";
+import DeleteProjectModal from "./DeleteProjectModal";
+import UpdateProjectModal from "./UpdateProjectModal"
+import { deleteProject, updateProject } from "../../store/actions/projectActions";
 
 const ProjectDetails = props => {
   const { project, auth } = props;
@@ -80,23 +34,52 @@ const ProjectDetails = props => {
     </Popover>
   );
 
-  const handleDeleteProject = projectId => {
-    props.deleteProject(projectId);
-    props.history.push("/");
-  };
-
-  const openModal = (projectTitle, projectId) => {
+  const openDeleteProjectModal = ({ title, id, deleteProject, history }) => {
     ModalManager.open(
-      <MyModal
-        title={projectTitle}
-        deleteProject={() => handleDeleteProject(projectId)}
+      <DeleteProjectModal
+        title={title}
+        id={id}
+        deleteProject={deleteProject}
+        history={history}
         onRequestClose={() => true}
       />
     );
   };
 
-  if (!auth.uid) return <Redirect to="/signin" />;
+  const openUpdateProjectModal = ({ id, updateProject }) => {
+    ModalManager.open(
+      <UpdateProjectModal
+        id={id}
+        updateProject={updateProject}
+        onRequestClose={() => true}
+      />
+    );
+  };
+
+  if (!isLoaded(project)) {
+    return <div className="text-center p-2">Loading...</div>;
+  }
+
+  // Show message if there are no todos
+  if (isEmpty(project)) {
+    return (
+      <div className="text-center p-2">
+        Bạn không phải là thành viên của nhóm này, nhấn vào đây để yêu cầu quyền
+        truy cập
+      </div>
+    );
+  }
+
+  if (!authId) return <Redirect to="/signin" />;
   if (project) {
+    // if (!project.roles.hasOwnProperty(authId)) {
+    //   return (
+    //     <div className="text-center p-2">
+    //       Bạn không phải là thành viên của nhóm này, nhấn vào đây để yêu cầu
+    //       quyền truy cập
+    //     </div>
+    //   );
+    // }
     const disabledButton = project.roles[authId] === "owner" ? false : true;
     return (
       <Container fluid>
@@ -129,7 +112,14 @@ const ProjectDetails = props => {
                       variant="light"
                       size="sm"
                       disabled={disabledButton}
-                      onClick={() => openModal(project.title, id)}
+                      onClick={() =>
+                        openDeleteProjectModal({
+                          title: project.title,
+                          id,
+                          deleteProject: props.deleteProject,
+                          history: props.history
+                        })
+                      }
                     >
                       Xoá bảng
                     </Button>
@@ -138,6 +128,12 @@ const ProjectDetails = props => {
                       variant="light"
                       size="sm"
                       disabled={disabledButton}
+                      onClick={() =>
+                        openUpdateProjectModal({
+                          id,
+                          updateProject: props.updateProject,
+                        })
+                      }
                     >
                       Sửa bảng
                     </Button>
@@ -165,16 +161,10 @@ const ProjectDetails = props => {
         </Row>
       </Container>
     );
-  } else {
-    return (
-      <div className="container center">
-        <p>Loading project...</p>
-      </div>
-    );
   }
 };
 
-const projectIdSelector = (_, props) => props.match.params.projectId
+const projectIdSelector = (_, props) => props.match.params.projectId;
 
 const mapStateToProps = createSelector(
   projectIdSelector,
@@ -184,16 +174,18 @@ const mapStateToProps = createSelector(
     project: firestore.data.projects && firestore.data.projects[id],
     auth
   })
-)
+);
 
 const mapActionToProps = {
-  deleteProject
+  deleteProject, updateProject
 };
 
 export default compose(
   connect(mapStateToProps, mapActionToProps),
-  firestoreConnect(props => [{
-    collection: 'projects',
-    doc: props.match.params.projectId
-  }])
-)(ProjectDetails)
+  firestoreConnect(props => [
+    {
+      collection: "projects",
+      doc: props.match.params.projectId
+    }
+  ])
+)(ProjectDetails);

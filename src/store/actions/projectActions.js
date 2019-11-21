@@ -3,7 +3,9 @@ import {
   CREATE_PROJECT_ERROR,
   DELETE_PROJECT_REQUEST,
   DELETE_PROJECT_SUCCESS,
-  DELETE_PROJECT_ERROR
+  DELETE_PROJECT_ERROR,
+  UPDATE_PROJECT_SUCCESS,
+  UPDATE_PROJECT_ERROR
 } from "../dataTypes/projectType";
 
 export const createProject = project => {
@@ -44,6 +46,22 @@ export const deleteProject = projectId => {
       })
       .catch(err => {
         dispatch({ type: DELETE_PROJECT_ERROR }, err);
+      });
+  };
+};
+
+export const updateProject = (id, project) => {
+  return (dispatch, getState, { getFirestore }) => {
+    const firestore = getFirestore();
+    firestore
+      .collection("projects")
+      .doc(id)
+      .update(project)
+      .then(() => {
+        dispatch({ type: UPDATE_PROJECT_SUCCESS });
+      })
+      .catch(err => {
+        dispatch({ type: UPDATE_PROJECT_ERROR }, err);
       });
   };
 };
