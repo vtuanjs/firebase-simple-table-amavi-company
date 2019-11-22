@@ -38,13 +38,13 @@ exports.projectDeleted = functions.firestore
         .where("projectId", "==", doc.id)
         .get()
         .then(records => {
-          const batch = firestore.batch()
+          const batch = firestore.batch();
 
           records.forEach(record => {
             batch.delete(record.ref);
-          })
+          });
 
-          return batch.commit()
+          return batch.commit();
         })
     ]);
   });
@@ -55,6 +55,19 @@ exports.recoredCreated = functions.firestore
     const record = doc.data();
     const notification = {
       content: `Đã thêm nhà cung cấp: ${record.name}`,
+      user: `${record.authorLastName} ${record.authorFirstName}`,
+      time: admin.firestore.FieldValue.serverTimestamp()
+    };
+
+    return createNotification(notification);
+  });
+
+  exports.recordDeleted = functions.firestore
+  .document("records/{recordId}")
+  .onDelete(doc => {
+    const record = doc.data();
+    const notification = {
+      content: `Đã xoá nhà cung cấp: ${record.name}`,
       user: `${record.authorLastName} ${record.authorFirstName}`,
       time: admin.firestore.FieldValue.serverTimestamp()
     };

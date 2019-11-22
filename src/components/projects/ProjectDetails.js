@@ -18,8 +18,11 @@ import {
 } from "react-bootstrap";
 import { ModalManager } from "react-dynamic-modal";
 import DeleteProjectModal from "./DeleteProjectModal";
-import UpdateProjectModal from "./UpdateProjectModal"
-import { deleteProject, updateProject } from "../../store/actions/projectActions";
+import UpdateProjectModal from "./UpdateProjectModal";
+import {
+  deleteProject,
+  updateProject
+} from "../../store/actions/projectActions";
 
 const ProjectDetails = props => {
   const { project, auth } = props;
@@ -34,13 +37,13 @@ const ProjectDetails = props => {
     </Popover>
   );
 
-  const openDeleteProjectModal = ({ title, id, deleteProject, history }) => {
+  const openDeleteProjectModal = ({ title, id }) => {
     ModalManager.open(
       <DeleteProjectModal
         title={title}
         id={id}
-        deleteProject={deleteProject}
-        history={history}
+        deleteProject={props.deleteProject}
+        history={props.history}
         onRequestClose={() => true}
       />
     );
@@ -115,9 +118,7 @@ const ProjectDetails = props => {
                       onClick={() =>
                         openDeleteProjectModal({
                           title: project.title,
-                          id,
-                          deleteProject: props.deleteProject,
-                          history: props.history
+                          id
                         })
                       }
                     >
@@ -131,7 +132,7 @@ const ProjectDetails = props => {
                       onClick={() =>
                         openUpdateProjectModal({
                           id,
-                          updateProject: props.updateProject,
+                          updateProject: props.updateProject
                         })
                       }
                     >
@@ -177,7 +178,8 @@ const mapStateToProps = createSelector(
 );
 
 const mapActionToProps = {
-  deleteProject, updateProject
+  deleteProject,
+  updateProject
 };
 
 export default compose(

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { connect } from "react-redux";
 import { firestoreConnect } from "react-redux-firebase";
 import { compose } from "redux";
@@ -7,60 +7,53 @@ import { Container, Form, Col, Row, Button } from "react-bootstrap";
 import { createSelector } from "reselect";
 import { firestoreSeclector, authSelector } from "../../store/selector";
 import moment from "moment";
-import { Modal, ModalManager, Effect } from "react-dynamic-modal";
-import { deleteRecord } from "../../store/actions/recordActions";
-
-const MyModal = props => {
-  const handelDelete = () => {
-    ModalManager.close();
-    props.deleteRecord();
-  };
-  return (
-    <Modal
-      style={{ content: { width: "45%" } }}
-      onRequestClose={props.onRequestClose}
-      effect={Effect.Sign3D}
-    >
-      <Row>
-        <Col className="p-4 mx-2">
-          <h3 className="text-center">Xác nhận xoá</h3>
-          <div>
-            Bạn có muốn xoá bảng <b>{props.title}</b> không?
-          </div>
-          <div>Sau khi xoá, dữ liệu không thể khôi phục.</div>
-          <div className="text-right mt-4">
-            <Button
-              size="sm"
-              variant="primary"
-              className="mx-1"
-              onClick={() => handelDelete()}
-            >
-              Xoá
-            </Button>
-            <Button size="sm" className="mx-1" onClick={ModalManager.close}>
-              Không
-            </Button>
-          </div>
-        </Col>
-      </Row>
-    </Modal>
-  );
-};
+import { ModalManager } from "react-dynamic-modal";
+import { updateRecord, deleteRecord } from "../../store/actions/recordActions";
+import DeleteRecordModal from "./DeleteRecord";
 
 const RecordDetails = props => {
   const { record, auth } = props;
   const id = props.id;
+  const projectId = props.match.params.projectId;
+
   if (!auth.uid) return <Redirect to="/signin" />;
-  const handleDeleteRecord = recordId => {
-    props.deleteRecord(recordId);
-    props.history.push(`/projects/${props.match.params.projectId}`);
+
+  const [isInputReadOnly, setIsInputReadOnly] = useState(true);
+  const refContainer = useRef();
+  const [form, setForm] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    address: "",
+    website: "",
+    product: "",
+    note: "",
+    rate: ""
+  });
+
+  const setAllowWriteInput = () => {
+    setIsInputReadOnly(false);
+    refContainer.current.focus();
   };
 
-  const openModal = (recordTitle, recordId) => {
+  const handleChangeForm = e => {
+    setForm({
+      ...form,
+      [e.target.id]: e.target.value
+    });
+  };
+
+  const handleUpdateRecord = () => {
+    props.updateRecord(id, form);
+    setIsInputReadOnly(true);
+  };
+  const openDeleteRecordModal = () => {
     ModalManager.open(
-      <MyModal
-        title={recordTitle}
-        deleteRecord={() => handleDeleteRecord(recordId)}
+      <DeleteRecordModal
+        id={id}
+        projectId={projectId}
+        deleteRecord={props.deleteRecord}
+        history={props.history}
         onRequestClose={() => true}
       />
     );
@@ -71,15 +64,48 @@ const RecordDetails = props => {
     return (
       <Container>
         <Col className="text-right mt-4">
-          <Button
-            className="mx-1"
-            size="sm"
-            variant="danger"
-            disabled={disabledButton}
-            onClick={() => openModal(record.title, id)}
-          >
-            Xoá record
-          </Button>
+          {!isInputReadOnly && (
+            <span>
+              <Button
+                className="mx-1"
+                size="sm"
+                variant="success"
+                onClick={handleUpdateRecord}
+              >
+                Xác nhận
+              </Button>
+              <Button
+                className="mx-1"
+                size="sm"
+                variant="success"
+                onClick={() => setIsInputReadOnly(true)}
+              >
+                Huỷ bỏ
+              </Button>
+            </span>
+          )}
+          {isInputReadOnly && (
+            <span>
+              <Button
+                className="mx-1"
+                size="sm"
+                variant="success"
+                disabled={disabledButton}
+                onClick={() => setAllowWriteInput()}
+              >
+                Sửa record
+              </Button>
+              <Button
+                className="mx-1"
+                size="sm"
+                variant="danger"
+                disabled={disabledButton || !isInputReadOnly}
+                onClick={openDeleteRecordModal}
+              >
+                Xoá record
+              </Button>
+            </span>
+          )}
           <Button as={Link} to={`/projects/${record.projectId}`}>
             Quay lại bảng
           </Button>
@@ -90,7 +116,14 @@ const RecordDetails = props => {
               Tên
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.name} />
+              <Form.Control
+                plaintext
+                id="name"
+                readOnly={isInputReadOnly}
+                defaultValue={record.name}
+                onChange={handleChangeForm}
+                ref={refContainer}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -98,7 +131,13 @@ const RecordDetails = props => {
               Số điện thoại
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.phone} />
+              <Form.Control
+                plaintext
+                id="phone"
+                readOnly={isInputReadOnly}
+                defaultValue={record.phone}
+                onChange={handleChangeForm}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -106,7 +145,13 @@ const RecordDetails = props => {
               Email
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.email} />
+              <Form.Control
+                plaintext
+                id="email"
+                readOnly={isInputReadOnly}
+                onChange={handleChangeForm}
+                defaultValue={record.email}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -114,7 +159,13 @@ const RecordDetails = props => {
               Địa chỉ
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.address} />
+              <Form.Control
+                plaintext
+                id="address"
+                readOnly={isInputReadOnly}
+                onChange={handleChangeForm}
+                defaultValue={record.address}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -122,7 +173,13 @@ const RecordDetails = props => {
               Website
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.website} />
+              <Form.Control
+                plaintext
+                id="website"
+                readOnly={isInputReadOnly}
+                onChange={handleChangeForm}
+                defaultValue={record.website}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -130,7 +187,13 @@ const RecordDetails = props => {
               Mặt hàng
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.product} />
+              <Form.Control
+                plaintext
+                id="product"
+                readOnly={isInputReadOnly}
+                onChange={handleChangeForm}
+                defaultValue={record.product}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -138,7 +201,13 @@ const RecordDetails = props => {
               Ghi chú
             </Form.Label>
             <Col lg="10" md="9">
-              <Form.Control plaintext readOnly defaultValue={record.note} />
+              <Form.Control
+                plaintext
+                id="note"
+                readOnly={isInputReadOnly}
+                onChange={handleChangeForm}
+                defaultValue={record.note}
+              />
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -147,10 +216,21 @@ const RecordDetails = props => {
             </Form.Label>
             <Col lg="10" md="9">
               <Form.Control
-                plaintext
-                readOnly
-                defaultValue={`${record.rate} sao`}
-              />
+                id="rate"
+                as="select"
+                type="number"
+                disabled={isInputReadOnly}
+                // readOnly={isInputReadOnly}
+                onChange={handleChangeForm}
+                defaultValue={`${record.rate}`}
+              >
+                <option disabled>Chọn...</option>
+                <option>5</option>
+                <option>4</option>
+                <option>3</option>
+                <option>2</option>
+                <option>1</option>
+              </Form.Control>
             </Col>
           </Form.Group>
           <Form.Group as={Row}>
@@ -203,6 +283,7 @@ const mapStateToProps = createSelector(
 );
 
 const mapActionToProps = {
+  updateRecord,
   deleteRecord
 };
 

@@ -17,7 +17,7 @@ class CreateRecord extends Component {
       website: localStorage.getItem("website") || "",
       product: localStorage.getItem("product") || "",
       note: localStorage.getItem("note") || "",
-      rate: "5",
+      rate: 5,
       projectId: this.props.projectId
     };
   }
@@ -156,7 +156,7 @@ class CreateRecord extends Component {
               <Form.Label htmlFor="rate">Chấm điểm</Form.Label>
               <Form.Control
                 as="select"
-                type="text"
+                type="number"
                 id="rate"
                 onChange={this.handleChange}
               >

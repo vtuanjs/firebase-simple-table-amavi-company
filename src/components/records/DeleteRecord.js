@@ -1,16 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import { Modal, ModalManager, Effect } from "react-dynamic-modal";
 import { Button, Row, Col } from "react-bootstrap";
 
-const DeleteProjectModal = props => {
-  const [inputValue, setInputValue] = useState("");
-  const handelDelete = (id, title) => {
-    if (inputValue === title) {
-      ModalManager.close();
-      props.deleteProject(id);
-      props.history.push("/");
-    }
+const DeleteRecordModal = props => {
+  const handelDelete = () => {
+    ModalManager.close();
+    props.deleteRecord(props.id);
+    props.history.push(`/projects/${props.projectId}`);
   };
+
   return (
     <Modal
       style={{ content: { width: "45%" } }}
@@ -24,20 +22,12 @@ const DeleteProjectModal = props => {
             Bạn có muốn xoá bảng <b>{props.title}</b> không?
           </div>
           <div>Sau khi xoá, dữ liệu không thể khôi phục.</div>
-          <div>Nhập lại tên bảng để xác nhận</div>
-          <input
-            type="text"
-            className="form-control"
-            placeholder={`Nhập lại tên bảng`}
-            autoFocus
-            onChange={e => setInputValue(e.target.value)}
-          ></input>
           <div className="text-right mt-4">
             <Button
               size="sm"
               variant="primary"
               className="mx-1"
-              onClick={() => handelDelete(props.id, props.title)}
+              onClick={handelDelete}
             >
               Xoá
             </Button>
@@ -51,4 +41,4 @@ const DeleteProjectModal = props => {
   );
 };
 
-export default DeleteProjectModal;
+export default DeleteRecordModal;

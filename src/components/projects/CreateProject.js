@@ -37,6 +37,7 @@ class CreateProject extends Component {
             <Form.Control
               type="text"
               id="title"
+              autoFocus
               onChange={this.handleChange}
               required
               autoComplete="off"

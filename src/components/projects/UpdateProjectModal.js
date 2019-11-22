@@ -30,6 +30,7 @@ const UpdateProjectModal = props => {
             type="text"
             className="form-control"
             placeholder={`Nhập tên bảng mới`}
+            autoFocus
             onChange={e => setTitle(e.target.value)}
           ></input>
           <input
