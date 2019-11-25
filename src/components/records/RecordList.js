@@ -1,47 +1,112 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Table } from "react-bootstrap";
+import { Container } from "react-bootstrap";
+import matchSorter from "match-sorter";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
+import "./style.css";
 
-const RecordList = ({ records }) => {
-  const handleShowRecords = () => {
-    if (!records) {
-      return <tr><td className="text-center" colSpan="6">Loading records...</td></tr>;
-    }
-    if (records.length === 0) {
-      return <tr><td className="text-center" colSpan="6">Không có dữ liệu nào</td></tr>;
-    }
+const RecordList = ({ records, projectId }) => {
+  if (!records) {
+    return <div className="container center p-2">Loadig records...</div>;
+  }
+  if (records.length === 0) {
+    return <div className="container center p-2">Không có dữ liệu nào</div>;
+  }
 
-    return records.map((record, index) => {
-      return (
-        <tr key={index + 1} className="text-left">
-          <td>{index + 1}</td>
-          <td>{record.name}</td>
-          <td>{record.phone}</td>
-          <td>{record.product}</td>
-          <td>{record.rate} sao</td>
-          <td>
-            <Link to={`/projects/${record.projectId}/records/${record.id}`}>
-              Link
-            </Link>
-          </td>
-        </tr>
-      );
-    });
-  };
   return (
-    <Table striped bordered hover size="sm">
-      <thead>
-        <tr className="text-left">
-          <th>STT</th>
-          <th>Tên</th>
-          <th>Điện thoại</th>
-          <th>Mặt hàng</th>
-          <th>Điểm</th>
-          <th>Khác</th>
-        </tr>
-      </thead>
-      <tbody>{handleShowRecords()}</tbody>
-    </Table>
+    <Container fluid>
+      <ReactTable
+        data={records}
+        filterable
+        defaultFilterMethod={(filter, row) =>
+          String(row[filter.id]) === filter.value
+        }
+        defaultPageSize={10}
+        className="-striped -highlight"
+        columns={[
+          {
+            Header: "Tên",
+            id: "name",
+            accessor: "name",
+            minWidth: 120,
+            maxWidth: 150,
+            filterAll: true,
+            Filter: ({ filter, onChange }) => (
+              <input
+                onChange={event => onChange(event.target.value)}
+                value={filter ? filter.value : ""}
+                placeholder="Search..."
+              />
+            ),
+            filterMethod: (filter, rows) =>
+              matchSorter(rows, filter.value, { keys: ["name"] })
+          },
+          {
+            Header: "Điện thoại",
+            id: "phone",
+            accessor: "phone",
+            minWidth: 100,
+            maxWidth: 140,
+            Filter: ({ filter, onChange }) => (
+              <input
+                onChange={event => onChange(event.target.value)}
+                value={filter ? filter.value : ""}
+                placeholder="Search..."
+              />
+            ),
+            filterMethod: (filter, rows) =>
+              matchSorter(rows, filter.value, { keys: ["phone"] }),
+            filterAll: true
+          },
+          {
+            Header: "Sản phẩm",
+            id: "product",
+            accessor: "product",
+            // minWidth: 400,
+            Filter: ({ filter, onChange }) => (
+              <input
+                onChange={event => onChange(event.target.value)}
+                value={filter ? filter.value : ""}
+                placeholder="Search..."
+              />
+            ),
+            filterMethod: (filter, rows) =>
+              matchSorter(rows, filter.value, { keys: ["product"] }),
+            filterAll: true
+          },
+          {
+            Header: "Đánh giá",
+            id: "rate",
+            accessor: "rate",
+            minWidth: 80,
+            maxWidth: 80,
+            Filter: ({ filter, onChange }) => (
+              <input
+                onChange={event => onChange(event.target.value)}
+                value={filter ? filter.value : ""}
+                placeholder="Search..."
+              />
+            ),
+            className: "text-center",
+            filterMethod: (filter, rows) =>
+              matchSorter(rows, filter.value, { keys: ["rate"] }),
+            filterAll: true
+          },
+          {
+            Header: "Khác",
+            accessor: "id",
+            id: "id",
+            filterable: false,
+            maxWidth: 50,
+            className: "text-center",
+            Cell: ({ value }) => (
+              <Link to={`/projects/${projectId}/records/${value}`}>Link</Link>
+            )
+          }
+        ]}
+      />
+    </Container>
   );
 };
 

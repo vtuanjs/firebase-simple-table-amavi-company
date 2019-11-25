@@ -8,13 +8,14 @@ import { Container, Row } from "react-bootstrap";
 
 const RecordContainer = props => {
   const { records, auth } = props;
+  const projectId = props.match.params.projectId;
 
   if (!auth.uid) return <Redirect to="/signin" />;
 
   return (
     <Container fluid>
       <Row>
-        <RecordList records={records} />
+        <RecordList records={records} projectId={projectId} />
       </Row>
     </Container>
   );

@@ -18,7 +18,7 @@ class CreateRecord extends Component {
       product: localStorage.getItem("product") || "",
       note: localStorage.getItem("note") || "",
       rate: 5,
-      projectId: this.props.projectId
+      projectId: this.props.projectId,
     };
   }
 
@@ -60,7 +60,7 @@ class CreateRecord extends Component {
 
   handleSubmit = e => {
     e.preventDefault();
-    this.props.createRecord(this.state);
+    this.props.createRecord(this.state, this.props.projectOwner);
     this.clearRecordStorage();
     this.props.refContainer.current.hide();
   };
@@ -196,10 +196,8 @@ class CreateRecord extends Component {
 
 const mapStateToProps = createSelector(authSelector, auth => ({ auth }));
 
-const mapDispatchToProps = dispatch => {
-  return {
-    createRecord: record => dispatch(createRecord(record))
-  };
-};
+const mapActionToProps = {
+  createRecord
+}
 
-export default connect(mapStateToProps, mapDispatchToProps)(CreateRecord);
+export default connect(mapStateToProps, mapActionToProps)(CreateRecord);

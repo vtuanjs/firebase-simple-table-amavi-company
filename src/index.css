@@ -28,3 +28,15 @@ input[type=password]:not(.browser-default):focus:not([readonly]) + label{
   color: #ec407a !important;
 }
 
+::-webkit-input-placeholder {
+  font-style: italic;
+}
+:-moz-placeholder {
+  font-style: italic;  
+}
+::-moz-placeholder {
+  font-style: italic;  
+}
+:-ms-input-placeholder {  
+  font-style: italic; 
+}

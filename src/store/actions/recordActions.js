@@ -7,7 +7,7 @@ import {
   UPDATE_RECORD_ERROR
 } from "../dataTypes/recordType";
 
-export const createRecord = record => {
+export const createRecord = (record, projectOwner) => {
   return (dispatch, getState, { getFirestore }) => {
     const firestore = getFirestore();
     const profile = getState().firebase.profile;
@@ -19,7 +19,8 @@ export const createRecord = record => {
         authorFirstName: profile.firstName,
         authorLastName: profile.lastName,
         roles: {
-          [authorId]: "owner"
+          [authorId]: "owner",
+          [projectOwner]: "owner"
         },
         createdAt: new Date()
       })

@@ -30,13 +30,6 @@ const ProjectDetails = props => {
   const refContainer = useRef();
   const authId = auth.uid;
 
-  const popover = (
-    <Popover id="pop" style={{ maxWidth: "none", minWidth: "30%" }}>
-      <Popover.Title as="h3">Tạo bản ghi mới</Popover.Title>
-      <CreateRecord projectId={id} refContainer={refContainer} />
-    </Popover>
-  );
-
   const openDeleteProjectModal = ({ title, id }) => {
     ModalManager.open(
       <DeleteProjectModal
@@ -75,6 +68,19 @@ const ProjectDetails = props => {
 
   if (!authId) return <Redirect to="/signin" />;
   if (project) {
+    const membersInProject = Object.keys(project.roles)
+    let projectOwner = ""
+    for (let member of membersInProject){
+      if (project.roles[member] === "owner"){
+        projectOwner = member
+      }
+    }
+    const popover = (
+      <Popover id="pop" style={{ maxWidth: "none", minWidth: "30%" }}>
+        <Popover.Title as="h3">Tạo bản ghi mới</Popover.Title>
+        <CreateRecord projectId={id} projectOwner={projectOwner} refContainer={refContainer} />
+      </Popover>
+    );
     // if (!project.roles.hasOwnProperty(authId)) {
     //   return (
     //     <div className="text-center p-2">
@@ -159,6 +165,12 @@ const ProjectDetails = props => {
         </Row>
         <Row className="white mr-2 ml-2">
           <RecordContainer projectId={project.uid} />
+        </Row>
+        <Row className="white mr-2 ml-2">
+          <div className="container center">
+
+          Có thể sử dụng phím Shift để sắp xếp theo nhiều mục, có thể thu, giãn khoảng cách cột
+          </div>
         </Row>
       </Container>
     );
