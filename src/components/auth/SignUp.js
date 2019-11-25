@@ -37,6 +37,7 @@ class SignUp extends Component {
               type="email"
               id="email"
               onChange={this.handleChange}
+              required
             />
           </Form.Group>
 
@@ -46,6 +47,7 @@ class SignUp extends Component {
               type="password"
               id="password"
               onChange={this.handleChange}
+              required
             />
           </Form.Group>
 
@@ -55,6 +57,7 @@ class SignUp extends Component {
               type="text"
               id="lastName"
               onChange={this.handleChange}
+              required
             />
           </Form.Group>
 
@@ -64,6 +67,7 @@ class SignUp extends Component {
               type="text"
               id="firstName"
               onChange={this.handleChange}
+              required
             />
           </Form.Group>
 
