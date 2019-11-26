@@ -29,7 +29,7 @@ class CreateRecord extends Component {
       "email",
       "address",
       "website",
-      "oridyct",
+      "product",
       "note"
     ];
     

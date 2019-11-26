@@ -1,5 +1,8 @@
 # TABLE APP
 
+### Testing
+https://test-firebase-f3a3b.firebaseapp.com
+
 ### Config
 
 src/config/fbConfig.js
